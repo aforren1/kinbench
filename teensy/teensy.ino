@@ -7,7 +7,6 @@ constexpr int pin_0 = A2; // A2 and A3 can either go to ADC0 or 1
 constexpr int pin_1 = A3;
 
 constexpr int parallel_pin = 14; // picked a random digital pin
-
 ADC *adc = new ADC();
 
 ADC::Sync_result result;
@@ -43,14 +42,12 @@ void setup()
 uint32_t counter = 0;
 void loop()
 {
-  while (microseconds < 100)
+  while (microseconds < 100) // busy wait
   {
   }
   microseconds = 0;
-  digital_res = digitalReadFast(parallel_pin); // 1 byte
-  result = adc->readSynchronizedContinuous();
-  result.result_adc0 = result.result_adc0; // 2 bytes each
-  result.result_adc1 = result.result_adc1; //
+  digital_res = digitalReadFast(parallel_pin); // get the current digital state
+  result = adc->readSynchronizedContinuous();  // get the latest analog values
   intoByte(iterator, digital_res);
   intoByte(iterator, (uint16_t)result.result_adc0);
   intoByte(iterator, (uint16_t)result.result_adc1);
@@ -62,6 +59,7 @@ void loop()
     Serial.send_now();
     iterator = output.begin();
     counter = 0;
+    // "blink" the LED (it's too fast, but a nice test signal for digital too)
     digitalWriteFast(LED_BUILTIN, !digitalReadFast(LED_BUILTIN));
   }
 }
